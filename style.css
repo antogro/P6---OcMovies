@@ -1,0 +1,51 @@
+h1 {
+    color: aqua;
+}
+
+.bestMovies {
+    border-radius: 10px;    
+}
+
+img {
+    border-radius: 20px;
+    padding: auto;
+}
+
+
+.movie-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border: 1px solid black;
+    z-index: 1000;
+}
+
+.movie-item {
+    display: inline-block;
+}
+
+#category-selector {
+    margin: 20px 0;
+  }
+  
+  #category-select {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: white;
+    cursor: pointer;
+  }
+  
+  #category-select:hover {
+    border-color: #888;
+  }
+  
+  #category-select:focus {
+    outline: none;
+    border-color: #555;
+    box-shadow: 0 0 5px rgba(81, 203, 238, 1);
+  }
