@@ -30,14 +30,6 @@ async function fetchMovies(categoryUrl) {
   }
 }
 
-function displayMovie(
-  moviesWithDetails,
-  containerId,
-  categoryTitle
-) {
-  display(moviesWithDetails, containerId, categoryTitle);
-}
-
 function displayBestMovie(movies, documentId) {
   const movie = movies[0];
   const container = document.getElementById(documentId);
@@ -46,30 +38,40 @@ function displayBestMovie(movies, documentId) {
         <div class="movie-content">
             
             <div class="movie-info">
-                <h3>${movie.original_title}</h3>
-                <p>${movie.description}</p>
-                <button id="details-button">
-                    <img src="${movie.image_url}" alt="Affiche du meilleur film">
-                </button>
-                </div>
+            <div class="best-movie-container">
+            <h3>${movie.original_title}</h3>
+            <img src="${movie.image_url}" alt="Affiche du meilleur film" class="best-movie-img">
+            <p>${movie.description}</p>
+            <button class="details-best-movie-button">Détails</button>
+              </div>
+              </div>
         </div>
     `;
   document
-    .getElementById("details-button")
+    .querySelector(".details-best-movie-button")
     .addEventListener("click", () => showMovieDetails(movie));
 }
 
 function displayBestMovies(movies, documentId, categoryTitle) {
   const movieSlice = movies.slice(0, 6);
   const container = document.getElementById(documentId);
+  if (!container) {
+    console.error(`Element with id "${documentId}" not found in the DOM.`);
+    return;
+  }
+
   const movieListHTML = movieSlice
     .map(
       (movie) => `
       <div class="movie-item">
-        <h3>${movie.title}</h3>
-        <button class="details-button">détails
-        <img src="${movie.image_url}" alt="Affiche de ${movie.title}"></button>
+      <div class="movie-poster">
+      <div class="movie-overlay">
+      <h3>${movie.title}</h3>
+      <button class="details-button">Détails</button>
       </div>
+      <img src="${movie.image_url}" alt="Affiche de ${movie.title}" class="movie">
+        </div>
+        </div>
     `
     )
     .join("");
@@ -77,14 +79,41 @@ function displayBestMovies(movies, documentId, categoryTitle) {
   container.innerHTML = `
       <h2>${categoryTitle}</h2>  
       <div class="movie-list">${movieListHTML}</div>
+      <button class="show-more" onclick="{(event) => toggleMovie('${documentId}', event)}">Afficher Plus</button>
     `;
+  const movieListContainer = container.querySelector(".movie-list");
+
+  movieListContainer.innerHTML = movieListHTML;
 
   const buttons = container.querySelectorAll(".details-button");
+  const showMoreButton = container.querySelectorAll(".show-more");
+  showMoreButton.forEach((button) => 
+  button.addEventListener("click", (event) => toggleMovie(documentId, event)));
+
   buttons.forEach((button, index) => {
     button.addEventListener("click", () => showMovieDetails(movieSlice[index]));
   });
 }
 
+
+function toggleMovie(categoryId) {
+  const container = document.getElementById(categoryId);
+  const hiddenMovie = container.querySelectorAll(".movie-item.hidden");
+  const showMoreButton = container.querySelector(".show-more");
+
+  if (hiddenMovie.length > 0) {
+    hiddenMovie.forEach((movie) => {
+      movie.classList.remove("hidden");
+    });
+    showMoreButton.textContent = "Afficher Moins";
+  } else {
+    const movieToHide = container.querySelectorAll(".movie-item:nth-child(n+3)");
+    movieToHide.forEach((movie) => {
+      movie.classList.add("hidden");
+    });
+    showMoreButton.textContent = "Afficher Plus";
+  }
+}
 
 function showMovieDetails(movie) {
   const popup = createNode("div");
@@ -132,12 +161,13 @@ function populateCategorySelect() {
 function handleCategoryChange() {
   const select = document.getElementById("category-select");
   const selectedValue = select.value;
+
   if (selectedValue) {
     const categoryUrl = genreMovie[selectedValue];
     const categoryTitle =
       selectedValue.charAt(0).toUpperCase() + selectedValue.slice(1);
     fetchMovies(categoryUrl).then((movies) => {
-      displayBestMovies(movies ,"category-movies", categoryTitle);
+      displayBestMovies(movies, "category-movies", categoryTitle);
     });
   } else {
     document.getElementById("category-movies").innerHTML = "";
@@ -145,20 +175,43 @@ function handleCategoryChange() {
 }
 
 async function initMovieDisplay() {
-    const bestMoviesData = await fetchMovies(bestMovies);
-    displayBestMovie(bestMoviesData, "best-movie");
-    displayBestMovies(bestMoviesData, "best-movies", "Films les mieux notés toutes catégories confondus");
+  const bestMoviesData = await fetchMovies(bestMovies);
+  displayBestMovie(bestMoviesData, "best-movie");
 
-    const fantasyMoviesData = await fetchMovies(genreMovie.Fantasy);
-    displayBestMovies(fantasyMoviesData, "movie-category-1", "Films les mieux notés de la catégorie fantastiques");
+  displayBestMovies(
+    bestMoviesData,
+    "best-movies",
+    "Films les mieux notés toutes catégories confondus"
+  );
 
-    const crimeMoviesData = await fetchMovies(genreMovie.Crime);
-    displayBestMovies(crimeMoviesData, "movie-category-2", "Films les mieux notés de la catégorie crime");
+  const fantasyMoviesData = await fetchMovies(genreMovie.Fantasy);
+  displayBestMovies(
+    fantasyMoviesData,
+    "movie-category-1",
+    "Films les mieux notés de la catégorie fantastiques"
+  );
 
-    populateCategorySelect();
-    document
-        .getElementById("category-select")
-        .addEventListener("change", handleCategoryChange);
+  const crimeMoviesData = await fetchMovies(genreMovie.Crime);
+  displayBestMovies(
+    crimeMoviesData,
+    "movie-category-2",
+    "Films les mieux notés de la catégorie crime"
+  );
+
+  populateCategorySelect();
+  document
+    .getElementById("category-select")
+    .addEventListener("change", handleCategoryChange);
+  console.log(window.innerWidth , window.innerHeight)
+  if (window.innerWidth <= 768){
+    document.querySelectorAll(".movie-item:nth-child(n+3)").forEach(movie => {
+      movie.classList.add("hidden")
+    });
+  } else if ((window.innerWidth <= 1024)){
+    document.querySelectorAll(".movie-item:nth-child(n+5)").forEach(movie => {
+      movie.classList.add("hidden")
+  });
+}
 }
 
 document.addEventListener("DOMContentLoaded", initMovieDisplay);
