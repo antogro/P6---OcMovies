@@ -34,13 +34,12 @@ function displayBestMovie(movies, documentId) {
   const movie = movies[0];
   const container = document.getElementById(documentId);
   container.innerHTML = `
-    <h2>Meilleur film</h2>
-        <div class="movie-content">
+  <h2>Meilleur film</h2>
+  <div class="movie-content">
             
-            <div class="movie-info">
-            <div class="best-movie-container">
-            <h3>${movie.original_title}</h3>
-            <img src="${movie.image_url}" alt="Affiche du meilleur film" class="best-movie-img">
+        <img src="${movie.image_url}" alt="Affiche du meilleur film" class="best-movie-img">
+        <div class="movie-info">
+        <h3>${movie.original_title}</h3>
             <p>${movie.description}</p>
             <button class="details-best-movie-button">Détails</button>
               </div>
@@ -120,22 +119,30 @@ function showMovieDetails(movie) {
   popup.className = "movie-popup";
 
   popup.innerHTML = `
-        <h2>${movie.title}</h2>
-        <img src="${movie.image_url}" alt="${movie.title}">
-        <p><strong>Année:</strong> ${movie.year}</p>
-        <p><strong>Score IMDB:</strong> ${movie.imdb_score}</p>
-        <p><strong>Réalisateur:</strong> ${movie.directors.join(", ")}</p>
+    <div class="popup-details">
+      <div class="popup-header">
+        <div class="popup-info">
+          <h2 class="popup-title">${movie.title}</h2>
+          <p class="movie-info">
+            <strong>${movie.year} - ${movie.genres.join(", ")}</strong><br>
+            <strong>${movie.duration} minutes - (${movie.countries.join(" / ")})</strong><br>
+            <strong>IMDB Score: ${movie.imdb_score}/10</strong>
+          </p>
+        </div>
+        <img src="${movie.image_url}" alt="${movie.title}" class="popup-image">
+      </div>
+      <p><strong>Réalisé par:</strong> ${movie.directors.join(", ")}</p>
+      <div class="popup-main-content">
+        <div class="popup-description">
+          <p class="movie-synopsis">${movie.description}</p>
+        </div>
+      </div>
+      <div class="popup-actors">
         <p><strong>Acteurs:</strong> ${movie.actors.join(", ")}</p>
-        <p><strong>Genre(s):</strong> ${movie.genres.join(", ")}</p>
-        <p><strong>Durée:</strong> ${movie.duration} min</p>
-        <p><strong>Date de sortie:</strong> ${movie.date_published}</p>
-        <p><strong>Recette au box office:</strong> ${
-          movie.worldwide_gross_income
-        }</p>
-        <p><strong>Pays d'origine:</strong> ${movie.countries}</p>
-        <p><strong>Description:</strong> ${movie.description}</p>
-        <button onclick="closePopup()">Fermer</button>
-    `;
+      </div>
+    </div>
+    <button class="close-popup-button" onclick="closePopup()">Fermer</button>
+  `;
 
   document.body.appendChild(popup);
 }
