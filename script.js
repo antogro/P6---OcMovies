@@ -36,19 +36,19 @@ function displayBestMovie(movies, documentId) {
   container.innerHTML = `
   <h2>Meilleur film</h2>
   <div class="movie-content">
-            
-        <img src="${movie.image_url}" alt="Affiche du meilleur film" class="best-movie-img">
-        <div class="movie-info">
-        <h3>${movie.original_title}</h3>
-            <p>${movie.description}</p>
-            <button class="details-best-movie-button">Détails</button>
-              </div>
-              </div>
-        </div>
-    `;
+  
+  <img src="${movie.image_url}" alt="Affiche du meilleur film" class="best-movie-img">
+  <div class="movie-info">
+  <h3>${movie.original_title}</h3>
+  <p>${movie.description}</p>
+  <button class="details-best-movie-button">Détails</button>
+  </div>
+  </div>
+  </div>
+  `;
   document
-    .querySelector(".details-best-movie-button")
-    .addEventListener("click", () => showMovieDetails(movie));
+  .querySelector(".details-best-movie-button")
+  .addEventListener("click", () => showMovieDetails(movie));
 }
 
 function displayBestMovies(movies, documentId, categoryTitle) {
@@ -58,57 +58,87 @@ function displayBestMovies(movies, documentId, categoryTitle) {
     console.error(`Element with id "${documentId}" not found in the DOM.`);
     return;
   }
-
+  
   const movieListHTML = movieSlice
-    .map(
-      (movie) => `
-      <div class="movie-item">
-      <div class="movie-poster">
-      <div class="movie-overlay">
-      <h3>${movie.title}</h3>
-      <button class="details-button">Détails</button>
-      </div>
-      <img src="${movie.image_url}" alt="Affiche de ${movie.title}" class="movie">
-        </div>
-        </div>
+  .map(
+    (movie) => `
+    <div class="movie-item">
+    <div class="movie-poster">
+    <div class="movie-overlay">
+    <h3>${movie.title}</h3>
+    <button class="details-button">Détails</button>
+    </div>
+    <img src="${movie.image_url}" alt="Affiche de ${movie.title}" class="movie">
+    </div>
+    </div>
     `
-    )
-    .join("");
-
+  )
+  .join("");
+  
   container.innerHTML = `
-      <h2>${categoryTitle}</h2>  
-      <div class="movie-list">${movieListHTML}</div>
-      <button class="show-more" onclick="{(event) => toggleMovie('${documentId}', event)}">Afficher Plus</button>
-    `;
+  <h2>${categoryTitle}</h2>  
+  <div class="movie-list">${movieListHTML}</div>
+  <button class="show-more" onclick="{(event) => toggleMovie('${documentId}', event)}">Afficher Plus</button>
+  `;
   const movieListContainer = container.querySelector(".movie-list");
-
+  
   movieListContainer.innerHTML = movieListHTML;
-
+  
   const buttons = container.querySelectorAll(".details-button");
   const showMoreButton = container.querySelectorAll(".show-more");
-  showMoreButton.forEach((button) => 
-  button.addEventListener("click", (event) => toggleMovie(documentId, event)));
+  showMoreButton.forEach((button) =>
+    button.addEventListener("click", (event) => toggleMovie(documentId, event))
+);
 
-  buttons.forEach((button, index) => {
-    button.addEventListener("click", () => showMovieDetails(movieSlice[index]));
-  });
+buttons.forEach((button, index) => {
+  button.addEventListener("click", () => showMovieDetails(movieSlice[index]));
+});
 }
 
+function displayLogo(){
+  const logo = createNode("img");
+  const baliseLogo = document.getElementById("logo")
+  if (getVisibleMoviesCount() === 2 ){
+    logo.src = "logo-dimension-smartphone.png"
+    logo.id = "logo-smartphone"
+  } 
+  else{
+    logo.src = "logo-dimension-tablette-pc.png"
+    logo.id = "logo-tablette-pc"
+  }
+  logo.alt = "Logo du site OcMovie"
+  baliseLogo.appendChild(logo);
+}
+
+function getVisibleMoviesCount() {
+  const screenWidth = window.innerWidth;
+  if (screenWidth <= 768) {
+    return 2;
+  } else if (screenWidth <= 1024) {
+    return 4;
+  } else {
+    return 6;
+  }
+}
 
 function toggleMovie(categoryId) {
   const container = document.getElementById(categoryId);
-  const hiddenMovie = container.querySelectorAll(".movie-item.hidden");
+  const hiddenMovies = container.querySelectorAll(".movie-item.hidden");
   const showMoreButton = container.querySelector(".show-more");
 
-  if (hiddenMovie.length > 0) {
-    hiddenMovie.forEach((movie) => {
+  const visibleMovies = getVisibleMoviesCount();
+
+  if (hiddenMovies.length > 0) {
+    hiddenMovies.forEach((movie) => {
       movie.classList.remove("hidden");
     });
     showMoreButton.textContent = "Afficher Moins";
   } else {
-    const movieToHide = container.querySelectorAll(".movie-item:nth-child(n+3)");
-    movieToHide.forEach((movie) => {
-      movie.classList.add("hidden");
+    const allMovies = container.querySelectorAll(".movie-item");
+    allMovies.forEach((movie, index) => {
+      if (index >= visibleMovies) {
+        movie.classList.add("hidden");
+      }
     });
     showMoreButton.textContent = "Afficher Plus";
   }
@@ -125,7 +155,9 @@ function showMovieDetails(movie) {
           <h2 class="popup-title">${movie.title}</h2>
           <p class="movie-info">
             <strong>${movie.year} - ${movie.genres.join(", ")}</strong><br>
-            <strong>${movie.duration} minutes - (${movie.countries.join(" / ")})</strong><br>
+            <strong>${movie.duration} minutes - (${movie.countries.join(
+    " / "
+  )})</strong><br>
             <strong>IMDB Score: ${movie.imdb_score}/10</strong>
           </p>
         </div>
@@ -185,40 +217,55 @@ async function initMovieDisplay() {
   const bestMoviesData = await fetchMovies(bestMovies);
   displayBestMovie(bestMoviesData, "best-movie");
 
-  displayBestMovies(
-    bestMoviesData,
-    "best-movies",
-    "Films les mieux notés toutes catégories confondus"
-  );
+  const categoriesToDisplay = [
+    {
+      data: bestMoviesData,
+      id: "best-movies",
+      title: "Films les mieux notés toutes catégories confondus",
+    },
+    {
+      data: await fetchMovies(genreMovie.Fantasy),
+      id: "movie-category-1",
+      title: "Films les mieux notés de la catégorie fantastiques",
+    },
+    {
+      data: await fetchMovies(genreMovie.Crime),
+      id: "movie-category-2",
+      title: "Films les mieux notés de la catégorie crime",
+    },
+  ];
 
-  const fantasyMoviesData = await fetchMovies(genreMovie.Fantasy);
-  displayBestMovies(
-    fantasyMoviesData,
-    "movie-category-1",
-    "Films les mieux notés de la catégorie fantastiques"
-  );
-
-  const crimeMoviesData = await fetchMovies(genreMovie.Crime);
-  displayBestMovies(
-    crimeMoviesData,
-    "movie-category-2",
-    "Films les mieux notés de la catégorie crime"
-  );
+  categoriesToDisplay.forEach((category) => {
+    displayBestMovies(category.data, category.id, category.title);
+  });
 
   populateCategorySelect();
   document
     .getElementById("category-select")
     .addEventListener("change", handleCategoryChange);
-  console.log(window.innerWidth , window.innerHeight)
-  if (window.innerWidth <= 768){
-    document.querySelectorAll(".movie-item:nth-child(n+3)").forEach(movie => {
-      movie.classList.add("hidden")
+
+  const applyInitialHidding = () => {
+    const visibleMovies = getVisibleMoviesCount();
+
+    document.querySelectorAll(".movie-list").forEach((list) => {
+      const movies = list.querySelectorAll(".movie-item");
+      movies.forEach((movie, index) => {
+        if (index >= visibleMovies) {
+          movie.classList.add("hidden");
+        } else {
+          movie.classList.remove("hidden");
+        }
+      });
+      const showMoreButton = list.parentElement.querySelector(".show-more");
+      if (showMoreButton) {
+        showMoreButton.textContent =
+          movies.length > visibleMovies ? "Afficher Plus" : "Afficher Moins";
+      }
     });
-  } else if ((window.innerWidth <= 1024)){
-    document.querySelectorAll(".movie-item:nth-child(n+5)").forEach(movie => {
-      movie.classList.add("hidden")
-  });
-}
+  };
+  applyInitialHidding();
+  window.addEventListener("resize", applyInitialHidding);
+  displayLogo()
 }
 
 document.addEventListener("DOMContentLoaded", initMovieDisplay);

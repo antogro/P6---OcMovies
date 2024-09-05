@@ -165,19 +165,19 @@ h2 {
   box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5);
 }
 
-.popup-title{
+.popup-title {
   font-size: 28px;
   text-align: start;
   align-items: center;
 }
 
-.popup-main-content{
+.popup-main-content {
   display: flex;
   justify-content: space-between;
   gap: 20px;
 }
 
-.popup-image{
+.popup-image {
   flex-shrink: 0;
   width: 150px;
   height: auto;
@@ -185,13 +185,10 @@ h2 {
   align-items: start;
 }
 
-
 .popup-description {
   font-size: 16px;
   flex-grow: 1;
 }
-
-
 
 .movie-synopsis {
   margin-top: 10px;
@@ -217,18 +214,13 @@ h2 {
   transition: background-color 0.3s;
 }
 
-
-
-.popup-header{
+.popup-header {
   display: flex;
   font-size: 17px;
   margin-bottom: 10px;
   line-height: 1.4;
   flex-direction: row;
 }
-
-
-
 
 #category-select {
   padding: 10px;
@@ -237,6 +229,7 @@ h2 {
   border-radius: 4px;
   background-color: white;
   cursor: pointer;
+  line-height: 1.6;
 }
 
 #category-select:hover {
@@ -328,7 +321,20 @@ h2 {
     background-color: rgba(0, 0, 0, 0.8);
   }
 
-  .best-movie h2 {
+  #logo-smartphone {
+    width: 350px;
+    margin-bottom: 20px;
+    margin-left: 23px;
+  }
+
+  #best-movies,
+  #movie-category-1,
+  #movie-category-2,
+  #category-selector {
+    margin-right: 20px;
+    margin-left: 50px;
+    padding-left: 20px;
+    margin-top: 20px;
   }
 }
 
@@ -336,11 +342,6 @@ h2 {
 @media (max-width: 811px) {
   .movie-item {
     flex-basis: calc(50% - 20px);
-  }
-
-  #logo {
-    width: 600px;
-    margin-bottom: 20px;
   }
 
   .best-movie-img {
