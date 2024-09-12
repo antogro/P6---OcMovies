@@ -47,8 +47,8 @@ function displayBestMovie(movies, documentId) {
   </div>
   `;
   document
-  .querySelector(".details-best-movie-button")
-  .addEventListener("click", () => showMovieDetails(movie));
+    .querySelector(".details-best-movie-button")
+    .addEventListener("click", () => showMovieDetails(movie));
 }
 
 function displayBestMovies(movies, documentId, categoryTitle) {
@@ -58,10 +58,10 @@ function displayBestMovies(movies, documentId, categoryTitle) {
     console.error(`Element with id "${documentId}" not found in the DOM.`);
     return;
   }
-  
+
   const movieListHTML = movieSlice
-  .map(
-    (movie) => `
+    .map(
+      (movie) => `
     <div class="movie-item">
     <div class="movie-poster">
     <div class="movie-overlay">
@@ -72,41 +72,48 @@ function displayBestMovies(movies, documentId, categoryTitle) {
     </div>
     </div>
     `
-  )
-  .join("");
-  
+    )
+    .join("");
+
   container.innerHTML = `
   <h2>${categoryTitle}</h2>  
   <div class="movie-list">${movieListHTML}</div>
   <button class="show-more" onclick="{(event) => toggleMovie('${documentId}', event)}">Afficher Plus</button>
   `;
   const movieListContainer = container.querySelector(".movie-list");
-  
+
   movieListContainer.innerHTML = movieListHTML;
-  
+
   const buttons = container.querySelectorAll(".details-button");
   const showMoreButton = container.querySelectorAll(".show-more");
   showMoreButton.forEach((button) =>
     button.addEventListener("click", (event) => toggleMovie(documentId, event))
-);
+  );
 
-buttons.forEach((button, index) => {
-  button.addEventListener("click", () => showMovieDetails(movieSlice[index]));
-});
+  const images = container.querySelectorAll(".movie");
+  images.forEach((image) => {
+    image.addEventListener("error", () => {
+      image.src = "pictureFile/Image-not-found.jpg";
+      image.id = "image-not-found";
+    });
+  });
+
+  buttons.forEach((button, index) => {
+    button.addEventListener("click", () => showMovieDetails(movieSlice[index]));
+  });
 }
 
-function displayLogo(){
+function displayLogo() {
   const logo = createNode("img");
-  const baliseLogo = document.getElementById("logo")
-  if (getVisibleMoviesCount() === 2 ){
-    logo.src = "logo-dimension-smartphone.png"
-    logo.id = "logo-smartphone"
-  } 
-  else{
-    logo.src = "logo-dimension-tablette-pc.png"
-    logo.id = "logo-tablette-pc"
+  const baliseLogo = document.getElementById("logo");
+  if (getVisibleMoviesCount() === 2) {
+    logo.src = "pictureFile/logo-dimension-smartphone.png";
+    logo.id = "logo-smartphone";
+  } else {
+    logo.src = "/pictureFile/logo-dimension-tablette-pc.png";
+    logo.id = "logo-tablette-pc";
   }
-  logo.alt = "Logo du site OcMovie"
+  logo.alt = "Logo du site OcMovie";
   baliseLogo.appendChild(logo);
 }
 
@@ -132,7 +139,7 @@ function toggleMovie(categoryId) {
     hiddenMovies.forEach((movie) => {
       movie.classList.remove("hidden");
     });
-    showMoreButton.textContent = "Afficher Moins";
+    showMoreButton.textContent = "Voir Moins";
   } else {
     const allMovies = container.querySelectorAll(".movie-item");
     allMovies.forEach((movie, index) => {
@@ -140,7 +147,7 @@ function toggleMovie(categoryId) {
         movie.classList.add("hidden");
       }
     });
-    showMoreButton.textContent = "Afficher Plus";
+    showMoreButton.textContent = "Voir Plus";
   }
 }
 
@@ -153,6 +160,7 @@ function showMovieDetails(movie) {
       <div class="popup-header">
         <div class="popup-info">
           <h2 class="popup-title">${movie.title}</h2>
+          <div class="popup-close-icon">&times</div>
           <p class="movie-info">
             <strong>${movie.year} - ${movie.genres.join(", ")}</strong><br>
             <strong>${movie.duration} minutes - (${movie.countries.join(
@@ -175,8 +183,20 @@ function showMovieDetails(movie) {
     </div>
     <button class="close-popup-button" onclick="closePopup()">Fermer</button>
   `;
-
   document.body.appendChild(popup);
+
+  // Correct the selector and add the event listener
+  const closeIcon = popup.querySelector(".popup-close-icon");
+  if (closeIcon) {
+    closeIcon.addEventListener("click", closePopup);
+  }
+
+  // Add event listener to the close button as well
+  const closeButton = popup.querySelector(".close-popup-button");
+  if (closeButton) {
+    closeButton.addEventListener("click", closePopup);
+  }
+  adjustPopupSize(popup);
 }
 
 function closePopup() {
@@ -185,6 +205,26 @@ function closePopup() {
     popup.remove();
   }
 }
+
+function adjustPopupSize(popup) {
+  const content = popup.querySelector(".popup-details");
+  const maxHeight = window.innerHeight * 0.9; // 90% of viewport height
+
+  if (content.offsetHeight > maxHeight) {
+    popup.style.height = `${maxHeight}px`;
+    popup.style.overflowY = "scroll";
+  } else {
+    popup.style.height = "auto";
+    popup.style.overflowY = "visible";
+  }
+}
+
+window.addEventListener("resize", () => {
+  const popup = document.querySelector(".movie-popup");
+  if (popup) {
+    adjustPopupSize(popup);
+  }
+});
 
 function populateCategorySelect() {
   const select = document.getElementById("category-select");
@@ -221,17 +261,17 @@ async function initMovieDisplay() {
     {
       data: bestMoviesData,
       id: "best-movies",
-      title: "Films les mieux notés toutes catégories confondus",
+      title: "Meilleurs films ",
     },
     {
       data: await fetchMovies(genreMovie.Fantasy),
       id: "movie-category-1",
-      title: "Films les mieux notés de la catégorie fantastiques",
+      title: "Fantastiques",
     },
     {
       data: await fetchMovies(genreMovie.Crime),
       id: "movie-category-2",
-      title: "Films les mieux notés de la catégorie crime",
+      title: "Crime",
     },
   ];
 
@@ -259,13 +299,13 @@ async function initMovieDisplay() {
       const showMoreButton = list.parentElement.querySelector(".show-more");
       if (showMoreButton) {
         showMoreButton.textContent =
-          movies.length > visibleMovies ? "Afficher Plus" : "Afficher Moins";
+          movies.length > visibleMovies ? "Voir Plus" : "Voir Moins";
       }
     });
   };
   applyInitialHidding();
   window.addEventListener("resize", applyInitialHidding);
-  displayLogo()
+  displayLogo();
 }
 
 document.addEventListener("DOMContentLoaded", initMovieDisplay);
