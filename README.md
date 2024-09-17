@@ -39,23 +39,23 @@ Le fichier config.js contient les paramètres suivants :
 # Installation et configuration
 
 Clonez le dépôt sur votre machine locale
-Assurez-vous que l'API OCMovies est en cours d'exécution sur http://localhost:8000 
-En suivant les instructions du fichier Readme de l'API OCMovies.
-Ouvrez le fichier index.html dans votre navigateur pour visualiser l'application
+- Assurez-vous que l'API OCMovies est en cours d'exécution sur http://localhost:8000, 
+en suivant les instructions du fichier Readme de l'API OCMovies.
+- Ouvrez le fichier index.html dans votre navigateur pour visualiser l'application
 
 # Utilisation
 
-La page principale affiche le film le mieux noté en haut, suivi de sections pour les films les mieux notés et deux catégories de films.
-Utilisez le sélecteur de catégorie en bas pour voir les films d'une catégorie spécifique.
-Cliquez sur un film pour voir plus de détails dans un popup.
+- La page principale affiche le film le mieux noté en haut, suivi de sections pour les films les mieux notés et deux catégories de films.
+- Utilisez le sélecteur de catégorie en bas pour voir les films d'une catégorie spécifique.
+- Cliquez sur un film pour voir plus de détails dans un popup.
 
 # Design responsive
 L'application est conçue pour être responsive :
 
-Appareils mobiles (max-width: 480px) : Mise en page en une seule colonne avec des cartes de films optimisées
-Tablettes (max-width: 820px) : Mise en page en deux colonnes pour les listes de films
-Bureau : Mise en page multi-colonnes avec effets de survol
+- Appareils mobiles (max-width: 480px) : Mise en page en une seule colonne avec des cartes de films optimisées
+- Tablettes (max-width: 820px) : Mise en page en deux colonnes pour les listes de films
+- Bureau : Mise en page multi-colonnes avec effets de survol
 
 # Auteurs
 
--  [Nom de l'auteur](https://github.com/antogro)
+-  [antogro](https://github.com/antogro)
