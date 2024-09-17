@@ -36,15 +36,14 @@ function displayBestMovie(movies, documentId) {
   container.innerHTML = `
   <h2>Meilleur film</h2>
   <div class="movie-content">
-  
-  <img src="${movie.image_url}" alt="Affiche du meilleur film" class="best-movie-img">
-  <div class="movie-info">
-  <h3>${movie.original_title}</h3>
-  <p>${movie.description}</p>
-  <button class="details-best-movie-button">Détails</button>
+    <img src="${movie.image_url}" alt="Affiche du meilleur film" class="best-movie-img">
+    <div class="movie-info">
+      <h3>${movie.original_title}</h3>
+      <p>${movie.description}</p>
+      <button class="details-best-movie-button">Détails</button>
+    </div>
   </div>
-  </div>
-  </div>
+
   `;
   document
     .querySelector(".details-best-movie-button")
@@ -63,13 +62,13 @@ function displayBestMovies(movies, documentId, categoryTitle) {
     .map(
       (movie) => `
     <div class="movie-item">
-    <div class="movie-poster">
-    <div class="movie-overlay">
-    <h3>${movie.title}</h3>
-    <button class="details-button">Détails</button>
-    </div>
-    <img src="${movie.image_url}" alt="Affiche de ${movie.title}" class="movie">
-    </div>
+      <div class="movie-poster">
+        <div class="movie-overlay">
+          <h3>${movie.title}</h3>
+          <button class="details-button">Détails</button>
+        </div>
+        <img src="${movie.image_url}" alt="Affiche de ${movie.title}" class="movie">
+      </div>
     </div>
     `
     )
@@ -78,7 +77,7 @@ function displayBestMovies(movies, documentId, categoryTitle) {
   container.innerHTML = `
   <h2>${categoryTitle}</h2>  
   <div class="movie-list">${movieListHTML}</div>
-  <button class="show-more" onclick="{(event) => toggleMovie('${documentId}', event)}">Afficher Plus</button>
+  <button class="show-more" onclick="{(event) => toggleMovie('${documentId}', event)}">Voir Plus</button>
   `;
   const movieListContainer = container.querySelector(".movie-list");
 
@@ -185,13 +184,11 @@ function showMovieDetails(movie) {
   `;
   document.body.appendChild(popup);
 
-  // Correct the selector and add the event listener
   const closeIcon = popup.querySelector(".popup-close-icon");
   if (closeIcon) {
     closeIcon.addEventListener("click", closePopup);
   }
 
-  // Add event listener to the close button as well
   const closeButton = popup.querySelector(".close-popup-button");
   if (closeButton) {
     closeButton.addEventListener("click", closePopup);
@@ -230,7 +227,7 @@ function populateCategorySelect() {
   const select = document.getElementById("category-select");
   select.innerHTML = '<option value="">--Sélectionnez une catégorie--</option>';
   Object.keys(genreMovie).forEach((key) => {
-    const option = createNode("option");
+    const option = createNode("option") ;
     option.value = key;
     option.textContent = key.charAt(0).toUpperCase() + key.slice(1);
     append(select, option);
