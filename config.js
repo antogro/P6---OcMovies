@@ -25,5 +25,5 @@ const genreMovie = {
     Animation: pathToOcMovie + "?genre=animation&sort_by=-imdb_score&page_size=6",
     Documentary: pathToOcMovie + "?genre=documentary&sort_by=-imdb_score&page_size=6",
     Music: pathToOcMovie + "?genre=music&sort_by=-imdb_score&page_size=6",
-    Mistery: pathToOcMovie + "?genre=mistery&sort_by=-imdb_score&page_size=6",
+    Mistery: pathToOcMovie + "?genre=mistery&sort_by=-imdb_score&page_size=6"
 }

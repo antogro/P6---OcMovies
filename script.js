@@ -50,11 +50,13 @@ function displayBestMovie(movies, documentId) {
 }
 
 function displayBestMovies(movies, documentId, categoryTitle) {
+  let movieSlice;
   if (documentId === "best-movies"){
-    movieSlice = movies.slice(1, 7);
+    movieSlice = movies.slice(1, 7); // Les meilleurs films
   } else {
-    movieSlice = movies.slice(0, 6);
+    movieSlice = movies.slice(0, 6); // Autres catégories
   }
+
   const container = document.getElementById(documentId);
   if (!container) {
     console.error(`Element with id "${documentId}" not found in the DOM.`);
@@ -63,12 +65,12 @@ function displayBestMovies(movies, documentId, categoryTitle) {
 
   const movieListHTML = movieSlice
     .map(
-      (movie) => `
+      (movie, index) => `
     <div class="movie-item">
       <div class="movie-poster">
         <div class="movie-overlay">
           <h3>${movie.title}</h3>
-          <button class="details-button">Détails</button>
+          <button class="details-button" data-movie-index="${index}">Détails</button>
         </div>
         <img src="${movie.image_url}" alt="Affiche de ${movie.title}" class="movie">
       </div>
@@ -82,27 +84,25 @@ function displayBestMovies(movies, documentId, categoryTitle) {
   <div class="movie-list">${movieListHTML}</div>
   <button class="show-more" onclick="{(event) => toggleMovie('${documentId}', event)}">Voir Plus</button>
   `;
-  const movieListContainer = container.querySelector(".movie-list");
 
-  movieListContainer.innerHTML = movieListHTML;
-
-  const showMoreButton = container.querySelectorAll(".show-more");
-  showMoreButton.forEach((button) =>
-    button.addEventListener("click", (event) => toggleMovie(documentId, event))
-);
-
-const images = container.querySelectorAll(".movie");
-images.forEach((image) => {
-  image.addEventListener("error", () => {
-    image.src = "pictureFile/Image-not-found.jpg";
-    image.id = "image-not-found";
+  const buttons = container.querySelectorAll(".details-button");
+  buttons.forEach((button) => {
+    button.addEventListener("click", (event) => {
+      const movieIndex = event.target.getAttribute("data-movie-index");
+      showMovieDetails(movieSlice[movieIndex]);
+    });
   });
-});
 
-const buttons = container.querySelectorAll(".details-button");
-buttons.forEach((button, index) => {
-  button.addEventListener("click", () => showMovieDetails(movieSlice[index]));
-});
+  const images = container.querySelectorAll(".movie");
+  images.forEach((image) => {
+    image.addEventListener("error", () => {
+      image.src = "pictureFile/Image-not-found.jpg";
+      image.id = "image-not-found";
+    });
+  });
+
+  const showMoreButton = container.querySelector(".show-more");
+  showMoreButton.addEventListener("click", (event) => toggleMovie(documentId, event));
 }
 
 function showMovieDetails(movie) {
