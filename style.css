@@ -170,7 +170,7 @@ h2 {
   border: 5px solid black;
   z-index: 1000;
   max-width: 90%;
-  width: 600px;
+  width: 400px;
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5);
@@ -195,7 +195,7 @@ h2 {
   flex-shrink: 0;
   width: 150px;
   height: auto;
-  margin-left: 100px;
+  margin-left: 65px;
   align-items: start;
 }
 
@@ -363,7 +363,6 @@ h2 {
   .best-movie-img {
     min-width: 90%;
     margin-right: 10%;
-    padding: auto;
   }
 
   .movie-content {
@@ -379,6 +378,7 @@ h2 {
   .movie-info p,
   .movie-info h3 {
     text-align: center;
+    padding-right: 5%;
   }
 
   .details-best-movie-button {
@@ -405,12 +405,6 @@ h2 {
     box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5);
   }
 
-  /* Bouton "Voir plus" */
-  .show-more {
-    display: flex;
-    align-items: center;
-    margin-right: 39%;
-  }
 }
 
 /* Styles pour les tablettes */
@@ -521,6 +515,7 @@ h2 {
     height: auto;
     margin-top: -50px;
     margin-right: 40%;
+    margin-left: 40%;
   }
 
   .director {
@@ -569,6 +564,5 @@ h2 {
   .show-more {
     display: flex;
     align-items: center;
-    margin-right: 46%;
   }
 }

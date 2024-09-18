@@ -20,7 +20,7 @@ const genreMovie = {
     News: pathToOcMovie + "?genre=news&sort_by=-imdb_score&page_size=6",
     Musical: pathToOcMovie + "?genre=musical&sort_by=-imdb_score&page_size=6",
     RealityTv: pathToOcMovie + "?genre=reality-tv&sort_by=-imdb_score&page_size=6",
-    FilmNoir: pathToOcMovie + "?genre=film-noir&sort_by=-imdb_score&page_size=6",
+    Film_Noir: pathToOcMovie + "?genre=film-noir&sort_by=-imdb_score&page_size=6",
     Adult: pathToOcMovie + "?genre=adult&sort_by=-imdb_score&page_size=6",
     Animation: pathToOcMovie + "?genre=animation&sort_by=-imdb_score&page_size=6",
     Documentary: pathToOcMovie + "?genre=documentary&sort_by=-imdb_score&page_size=6",

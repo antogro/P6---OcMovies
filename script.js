@@ -43,7 +43,6 @@ function displayBestMovie(movies, documentId) {
       <button class="details-best-movie-button">Détails</button>
     </div>
   </div>
-
   `;
   document
     .querySelector(".details-best-movie-button")
@@ -51,7 +50,11 @@ function displayBestMovie(movies, documentId) {
 }
 
 function displayBestMovies(movies, documentId, categoryTitle) {
-  const movieSlice = movies.slice(0, 6);
+  if (documentId === "best-movies"){
+    movieSlice = movies.slice(1, 7);
+  } else {
+    movieSlice = movies.slice(0, 6);
+  }
   const container = document.getElementById(documentId);
   if (!container) {
     console.error(`Element with id "${documentId}" not found in the DOM.`);
@@ -83,23 +86,69 @@ function displayBestMovies(movies, documentId, categoryTitle) {
 
   movieListContainer.innerHTML = movieListHTML;
 
-  const buttons = container.querySelectorAll(".details-button");
   const showMoreButton = container.querySelectorAll(".show-more");
   showMoreButton.forEach((button) =>
     button.addEventListener("click", (event) => toggleMovie(documentId, event))
-  );
+);
 
-  const images = container.querySelectorAll(".movie");
-  images.forEach((image) => {
-    image.addEventListener("error", () => {
-      image.src = "pictureFile/Image-not-found.jpg";
-      image.id = "image-not-found";
-    });
+const images = container.querySelectorAll(".movie");
+images.forEach((image) => {
+  image.addEventListener("error", () => {
+    image.src = "pictureFile/Image-not-found.jpg";
+    image.id = "image-not-found";
   });
+});
 
-  buttons.forEach((button, index) => {
-    button.addEventListener("click", () => showMovieDetails(movieSlice[index]));
-  });
+const buttons = container.querySelectorAll(".details-button");
+buttons.forEach((button, index) => {
+  button.addEventListener("click", () => showMovieDetails(movieSlice[index]));
+});
+}
+
+function showMovieDetails(movie) {
+  const popup = createNode("div");
+  popup.className = "movie-popup";
+
+  popup.innerHTML = `
+    <div class="popup-details">
+      <div class="popup-header">
+        <div class="popup-info">
+          <h2 class="popup-title">${movie.title}</h2>
+          <div class="popup-close-icon">&times</div>
+          <p class="movie-info">
+            <strong>${movie.year} - ${movie.genres.join(", ")}</strong><br>
+            <strong>${movie.duration} minutes - (${movie.countries.join(
+    " / "
+  )})</strong><br>
+            <strong>IMDB Score: ${movie.imdb_score}/10</strong>
+          </p>
+        </div>
+        <img src="${movie.image_url}" alt="${movie.title}" class="popup-image">
+      </div>
+      <p><strong>Réalisé par:</strong> ${movie.directors.join(", ")}</p>
+      <div class="popup-main-content">
+        <div class="popup-description">
+          <p class="movie-synopsis">${movie.description}</p>
+        </div>
+      </div>
+      <div class="popup-actors">
+        <p><strong>Acteurs:</strong> ${movie.actors.join(", ")}</p>
+      </div>
+    </div>
+    <button class="close-popup-button" onclick="closePopup()">Fermer</button>
+  `;
+  document.body.appendChild(popup);
+
+  const closeIcon = popup.querySelector(".popup-close-icon");
+  if (closeIcon) {
+    closeIcon.addEventListener("click", closePopup);
+  }
+
+  const closeButton = popup.querySelector(".close-popup-button");
+  if (closeButton) {
+    closeButton.addEventListener("click", closePopup);
+  }
+  adjustPopupSize(popup);
 }
 
 function displayLogo() {
@@ -150,52 +199,6 @@ function toggleMovie(categoryId) {
   }
 }
 
-function showMovieDetails(movie) {
-  const popup = createNode("div");
-  popup.className = "movie-popup";
-
-  popup.innerHTML = `
-    <div class="popup-details">
-      <div class="popup-header">
-        <div class="popup-info">
-          <h2 class="popup-title">${movie.title}</h2>
-          <div class="popup-close-icon">&times</div>
-          <p class="movie-info">
-            <strong>${movie.year} - ${movie.genres.join(", ")}</strong><br>
-            <strong>${movie.duration} minutes - (${movie.countries.join(
-    " / "
-  )})</strong><br>
-            <strong>IMDB Score: ${movie.imdb_score}/10</strong>
-          </p>
-        </div>
-        <img src="${movie.image_url}" alt="${movie.title}" class="popup-image">
-      </div>
-      <p><strong>Réalisé par:</strong> ${movie.directors.join(", ")}</p>
-      <div class="popup-main-content">
-        <div class="popup-description">
-          <p class="movie-synopsis">${movie.description}</p>
-        </div>
-      </div>
-      <div class="popup-actors">
-        <p><strong>Acteurs:</strong> ${movie.actors.join(", ")}</p>
-      </div>
-    </div>
-    <button class="close-popup-button" onclick="closePopup()">Fermer</button>
-  `;
-  document.body.appendChild(popup);
-
-  const closeIcon = popup.querySelector(".popup-close-icon");
-  if (closeIcon) {
-    closeIcon.addEventListener("click", closePopup);
-  }
-
-  const closeButton = popup.querySelector(".close-popup-button");
-  if (closeButton) {
-    closeButton.addEventListener("click", closePopup);
-  }
-  adjustPopupSize(popup);
-}
-
 function closePopup() {
   const popup = document.querySelector(".movie-popup");
   if (popup) {
@@ -215,13 +218,6 @@ function adjustPopupSize(popup) {
     popup.style.overflowY = "visible";
   }
 }
-
-window.addEventListener("resize", () => {
-  const popup = document.querySelector(".movie-popup");
-  if (popup) {
-    adjustPopupSize(popup);
-  }
-});
 
 function populateCategorySelect() {
   const select = document.getElementById("category-select");
