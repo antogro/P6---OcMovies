@@ -1,3 +1,25 @@
+const pathToOcMovie = "http://localhost:8000/api/v1/";
+const bestMovies = `${pathToOcMovie}titles/?sort_by=-imdb_score&page_size=7`;
+
+async function genreName() {
+  try {
+    const pathToCategory = `${pathToOcMovie}genres/?page_size=25`;
+    const response = await fetch(pathToCategory);
+    const data = await response.json();
+    const genres = data.results;
+
+    if (genres && genres.length > 0) {
+      return genres.map((genre) => genre.name);
+    }
+  } catch (error) {
+    console.error("Error fetching genre data:", error);
+  }
+}
+
+function categoryUrl(genre) {
+  return `${pathToOcMovie}titles/?genre=${genre}&sort_by=-imdb_score&page_size=6`;
+}
+
 function createNode(element) {
   return document.createElement(element);
 }
@@ -17,55 +39,50 @@ async function fetchMovies(categoryUrl) {
     const data = await response.json();
     const movies = data.results;
 
-    if (movies.length > 0) {
+    if (movies && movies.length > 0) {
       const moviesWithDetails = await Promise.all(
         movies.slice(0, 7).map((movie) => fetchMovieDetails(movie.url))
       );
       return moviesWithDetails;
     } else {
-      console.error("aucun film trouvé dans l'API.");
+      console.error("Aucun film trouvé dans l'API.");
+      return [];
     }
   } catch (error) {
     console.error("Erreur lors de la récupération des données: ", error);
+    return [];
   }
 }
 
 function displayBestMovie(movies, documentId) {
   const movie = movies[0];
   const container = document.getElementById(documentId);
-  container.innerHTML = `
-  <h2>Meilleur film</h2>
-  <div class="movie-content">
-    <img src="${movie.image_url}" alt="Affiche du meilleur film" class="best-movie-img">
-    <div class="movie-info">
-      <h3>${movie.original_title}</h3>
-      <p>${movie.description}</p>
-      <button class="details-best-movie-button">Détails</button>
-    </div>
-  </div>
-  `;
-  document
-    .querySelector(".details-best-movie-button")
-    .addEventListener("click", () => showMovieDetails(movie));
+
+  if (movie) {
+    container.innerHTML = `
+      <h2>Meilleur film</h2>
+      <div class="movie-content">
+        <img src="${movie.image_url}" alt="Affiche du meilleur film" class="best-movie-img">
+        <div class="movie-info">
+          <h3>${movie.original_title}</h3>
+          <p>${movie.description}</p>
+          <button class="details-best-movie-button">Détails</button>
+        </div>
+      </div>
+    `;
+    document.querySelector(".details-best-movie-button").addEventListener("click", () => showMovieDetails(movie));
+  }
 }
 
 function displayBestMovies(movies, documentId, categoryTitle) {
-  let movieSlice;
-  if (documentId === "best-movies"){
-    movieSlice = movies.slice(1, 7); // Les meilleurs films
-  } else {
-    movieSlice = movies.slice(0, 6); // Autres catégories
-  }
-
   const container = document.getElementById(documentId);
   if (!container) {
     console.error(`Element with id "${documentId}" not found in the DOM.`);
     return;
   }
 
-  const movieListHTML = movieSlice
-    .map(
-      (movie, index) => `
+  const movieSlice = (documentId === "best-movies") ? movies.slice(1, 7) : movies.slice(0, 6);
+  const movieListHTML = movieSlice.map((movie, index) => `
     <div class="movie-item">
       <div class="movie-poster">
         <div class="movie-overlay">
@@ -75,40 +92,34 @@ function displayBestMovies(movies, documentId, categoryTitle) {
         <img src="${movie.image_url}" alt="Affiche de ${movie.title}" class="movie">
       </div>
     </div>
-    `
-    )
-    .join("");
+  `).join("");
 
   container.innerHTML = `
-  <h2>${categoryTitle}</h2>  
-  <div class="movie-list">${movieListHTML}</div>
-  <button class="show-more" onclick="{(event) => toggleMovie('${documentId}', event)}">Voir Plus</button>
+    <h2>${categoryTitle}</h2>  
+    <div class="movie-list">${movieListHTML}</div>
+    <button class="show-more">Voir Plus</button>
   `;
 
-  const buttons = container.querySelectorAll(".details-button");
-  buttons.forEach((button) => {
+  container.querySelectorAll(".details-button").forEach((button) => {
     button.addEventListener("click", (event) => {
       const movieIndex = event.target.getAttribute("data-movie-index");
       showMovieDetails(movieSlice[movieIndex]);
     });
   });
 
-  const images = container.querySelectorAll(".movie");
-  images.forEach((image) => {
+  container.querySelectorAll(".movie").forEach((image) => {
     image.addEventListener("error", () => {
       image.src = "pictureFile/Image-not-found.jpg";
       image.id = "image-not-found";
     });
   });
 
-  const showMoreButton = container.querySelector(".show-more");
-  showMoreButton.addEventListener("click", (event) => toggleMovie(documentId, event));
+  container.querySelector(".show-more").addEventListener("click", () => toggleMovie(documentId));
 }
 
 function showMovieDetails(movie) {
   const popup = createNode("div");
   popup.className = "movie-popup";
-
   popup.innerHTML = `
     <div class="popup-details">
       <div class="popup-header">
@@ -117,13 +128,11 @@ function showMovieDetails(movie) {
           <div class="popup-close-icon">&times</div>
           <p class="movie-info">
             <strong>${movie.year} - ${movie.genres.join(", ")}</strong><br>
-            <strong>${movie.duration} minutes - (${movie.countries.join(
-    " / "
-  )})</strong><br>
+            <strong>${movie.duration} minutes - (${movie.countries.join(" / ")})</strong><br>
             <strong>IMDB Score: ${movie.imdb_score}/10</strong>
           </p>
         </div>
-        <img src="${movie.image_url}" alt="${movie.title}" class="popup-image">
+        <img src="${movie.image_url}" alt="${movie.title}" class="popup-image" onerror="this.src='pictureFile/Image-not-found.jpg'; this.id='image-not-found-popup';">
       </div>
       <p><strong>Réalisé par:</strong> ${movie.directors.join(", ")}</p>
       <div class="popup-main-content">
@@ -137,56 +146,29 @@ function showMovieDetails(movie) {
     </div>
     <button class="close-popup-button" onclick="closePopup()">Fermer</button>
   `;
+
   document.body.appendChild(popup);
+  popup.querySelector(".popup-close-icon").addEventListener("click", closePopup);
+  popup.querySelector(".close-popup-button").addEventListener("click", closePopup);
 
-  const closeIcon = popup.querySelector(".popup-close-icon");
-  if (closeIcon) {
-    closeIcon.addEventListener("click", closePopup);
-  }
-
-  const closeButton = popup.querySelector(".close-popup-button");
-  if (closeButton) {
-    closeButton.addEventListener("click", closePopup);
-  }
   adjustPopupSize(popup);
-}
-
-function displayLogo() {
-  const logo = createNode("img");
-  const baliseLogo = document.getElementById("logo");
-  if (getVisibleMoviesCount() === 2) {
-    logo.src = "pictureFile/logo-dimension-smartphone.png";
-    logo.id = "logo-smartphone";
-  } else {
-    logo.src = "/pictureFile/logo-dimension-tablette-pc.png";
-    logo.id = "logo-tablette-pc";
-  }
-  logo.alt = "Logo du site OcMovie";
-  baliseLogo.appendChild(logo);
 }
 
 function getVisibleMoviesCount() {
   const screenWidth = window.innerWidth;
-  if (screenWidth <= 768) {
-    return 2;
-  } else if (screenWidth <= 1024) {
-    return 4;
-  } else {
-    return 6;
-  }
+  if (screenWidth <= 600) return 2;
+  if (screenWidth <= 1120) return 4;
+  return 6;
 }
 
 function toggleMovie(categoryId) {
   const container = document.getElementById(categoryId);
   const hiddenMovies = container.querySelectorAll(".movie-item.hidden");
   const showMoreButton = container.querySelector(".show-more");
-
   const visibleMovies = getVisibleMoviesCount();
 
   if (hiddenMovies.length > 0) {
-    hiddenMovies.forEach((movie) => {
-      movie.classList.remove("hidden");
-    });
+    hiddenMovies.forEach((movie) => movie.classList.remove("hidden"));
     showMoreButton.textContent = "Voir Moins";
   } else {
     const allMovies = container.querySelectorAll(".movie-item");
@@ -201,9 +183,7 @@ function toggleMovie(categoryId) {
 
 function closePopup() {
   const popup = document.querySelector(".movie-popup");
-  if (popup) {
-    popup.remove();
-  }
+  if (popup) popup.remove();
 }
 
 function adjustPopupSize(popup) {
@@ -219,13 +199,14 @@ function adjustPopupSize(popup) {
   }
 }
 
-function populateCategorySelect() {
+async function populateCategorySelect() {
   const select = document.getElementById("category-select");
   select.innerHTML = '<option value="">--Sélectionnez une catégorie--</option>';
-  Object.keys(genreMovie).forEach((key) => {
-    const option = createNode("option") ;
-    option.value = key;
-    option.textContent = key.charAt(0).toUpperCase() + key.slice(1);
+  const genres = await genreName();
+  genres.forEach((genre) => {
+    const option = createNode("option");
+    option.value = genre;
+    option.textContent = genre.charAt(0).toUpperCase() + genre.slice(1);
     append(select, option);
   });
 }
@@ -235,10 +216,9 @@ function handleCategoryChange() {
   const selectedValue = select.value;
 
   if (selectedValue) {
-    const categoryUrl = genreMovie[selectedValue];
-    const categoryTitle =
-      selectedValue.charAt(0).toUpperCase() + selectedValue.slice(1);
-    fetchMovies(categoryUrl).then((movies) => {
+    const categoryUrlStr = categoryUrl(selectedValue);
+    const categoryTitle = selectedValue.charAt(0).toUpperCase() + selectedValue.slice(1);
+    fetchMovies(categoryUrlStr).then((movies) => {
       displayBestMovies(movies, "category-movies", categoryTitle);
     });
   } else {
@@ -254,15 +234,15 @@ async function initMovieDisplay() {
     {
       data: bestMoviesData,
       id: "best-movies",
-      title: "Meilleurs films ",
+      title: "Meilleurs films",
     },
     {
-      data: await fetchMovies(genreMovie.Fantasy),
+      data: await fetchMovies(categoryUrl("Fantasy")),
       id: "movie-category-1",
       title: "Fantastiques",
     },
     {
-      data: await fetchMovies(genreMovie.Crime),
+      data: await fetchMovies(categoryUrl("Crime")),
       id: "movie-category-2",
       title: "Crime",
     },
@@ -272,33 +252,25 @@ async function initMovieDisplay() {
     displayBestMovies(category.data, category.id, category.title);
   });
 
-  populateCategorySelect();
+  await populateCategorySelect();
   document
     .getElementById("category-select")
     .addEventListener("change", handleCategoryChange);
 
   const applyInitialHidding = () => {
     const visibleMovies = getVisibleMoviesCount();
-
     document.querySelectorAll(".movie-list").forEach((list) => {
       const movies = list.querySelectorAll(".movie-item");
       movies.forEach((movie, index) => {
-        if (index >= visibleMovies) {
-          movie.classList.add("hidden");
-        } else {
-          movie.classList.remove("hidden");
-        }
+        movie.classList.toggle("hidden", index >= visibleMovies);
       });
       const showMoreButton = list.parentElement.querySelector(".show-more");
-      if (showMoreButton) {
-        showMoreButton.textContent =
-          movies.length > visibleMovies ? "Voir Plus" : "Voir Moins";
-      }
+      showMoreButton.textContent = movies.length > visibleMovies ? "Voir Plus" : "Voir Moins";
     });
   };
+
   applyInitialHidding();
   window.addEventListener("resize", applyInitialHidding);
-  displayLogo();
 }
 
 document.addEventListener("DOMContentLoaded", initMovieDisplay);
