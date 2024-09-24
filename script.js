@@ -120,6 +120,10 @@ function displayBestMovies(movies, documentId, categoryTitle) {
 function showMovieDetails(movie) {
   const popup = createNode("div");
   popup.className = "movie-popup";
+  let grossIncome = ''
+  if (movie.worldwide_gross_income != null) {
+    grossIncome = `<strong>Recette Box Office: </strong>${movie.worldwide_gross_income.toLocaleString('fr-FR')} $` 
+  }
   popup.innerHTML = `
     <div class="popup-details">
       <div class="popup-header">
@@ -129,19 +133,20 @@ function showMovieDetails(movie) {
           <p class="movie-info">
             <strong>${movie.year} - ${movie.genres.join(", ")}</strong><br>
             <strong>${movie.duration} minutes - (${movie.countries.join(" / ")})</strong><br>
+            ${grossIncome.split(3)} <br>
             <strong>IMDB Score: ${movie.imdb_score}/10</strong>
           </p>
         </div>
         <img src="${movie.image_url}" alt="${movie.title}" class="popup-image" onerror="this.src='pictureFile/Image-not-found.jpg'; this.id='image-not-found-popup';">
       </div>
-      <p><strong>Réalisé par:</strong> ${movie.directors.join(", ")}</p>
+      <p><strong>Réalisé par:</strong> <br>${movie.directors.join(", ")}</p>
       <div class="popup-main-content">
         <div class="popup-description">
           <p class="movie-synopsis">${movie.description}</p>
         </div>
       </div>
       <div class="popup-actors">
-        <p><strong>Acteurs:</strong> ${movie.actors.join(", ")}</p>
+        <p><strong>Acteurs:</strong> <br> ${movie.actors.join(", ")}</p>
       </div>
     </div>
     <button class="close-popup-button" onclick="closePopup()">Fermer</button>
